@@ -105,3 +105,4 @@ dist
 
 # Build folders
 feed-service/build/
+user-service/build/
