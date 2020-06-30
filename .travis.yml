@@ -12,6 +12,7 @@ before_install:
   # Print the version for logging
   - docker --version && docker-compose --version
   
+
   ## Upgrade Docker Compose
   # 1. Remove existing docker-compose
   - sudo rm /usr/local/bin/docker-compose
@@ -22,6 +23,20 @@ before_install:
   # 3. Update permissions for the folder and move it to system dir
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
+
+
+  ## Configure AWS
+  # 1. Create dir
+  - mkdir ${HOME}/.aws
+
+  # 2. AWS Configs
+  # AWS_CONFIG environment variable in Travis will hold base64 encoded string of your .aws/config file
+  - echo "$AWS_CONFIG" | base64 --decode > ${HOME}/.aws/config
+
+  # 3. AWS Credentials
+  # AWS_CREDS environment variable in Travis will hold base64 encoded string of your .aws/credentials file
+  - echo "$AWS_CREDS" | base64 --decode > ${HOME}/.aws/credentials
+
 
   ## Configure Kubernetes - Ref: https://caveofcode.com/continuous-delivery-to-kubernetes-with-travis-ci/
   # 1. Get Kubernetes
