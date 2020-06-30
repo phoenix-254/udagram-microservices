@@ -1,0 +1,26 @@
+language: node_js
+node_js:
+  - 14
+
+services:
+  - docker
+
+script:
+  # Print the version for logging
+  - docker --version
+
+  # Build docker image for feed microservice and tag it with remote image
+  - cd feed-service
+  - docker build -t feed-service .
+  - docker tag feed-service phoenix254/feed-service:v1
+  
+  # Build docker image for user microservice and tag it with remote image
+  - cd ../user-service
+  - docker build -t user-service .
+  - docker tag user-service phoenix254/user-service:v1
+
+after_success:
+  # Deploy
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker push phoenix254/feed-service:v1
+  - docker push phoenix254/user-service:v1
