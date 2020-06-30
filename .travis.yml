@@ -26,14 +26,21 @@ before_install:
 
 
   ## Configure AWS
-  # 1. Create dir
+
+  # 1. Get AWS CLI, install it and set path variable
+  - curl https://s3.amazonaws.com/aws-cli/awscli-bundle.zip -o awscli-bundle.zip
+  - unzip awscli-bundle.zip
+  - ./awscli-bundle/install -b ~/bin/aws
+  - export PATH=~/bin:$PATH
+  
+  # 2. Create config dir
   - mkdir ${HOME}/.aws
 
-  # 2. AWS Configs
+  # 3. Set AWS Configs
   # AWS_CONFIG environment variable in Travis will hold base64 encoded string of your .aws/config file
   - echo "$AWS_CONFIG" | base64 --decode > ${HOME}/.aws/config
 
-  # 3. AWS Credentials
+  # 4. AWS Credentials
   # AWS_CREDS environment variable in Travis will hold base64 encoded string of your .aws/credentials file
   - echo "$AWS_CREDS" | base64 --decode > ${HOME}/.aws/credentials
 
