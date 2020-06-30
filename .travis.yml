@@ -5,22 +5,46 @@ node_js:
 services:
   - docker
 
-script:
-  # Print the version for logging
-  - docker --version
-
-  # Build docker image for feed microservice and tag it with remote image
-  - cd feed-service
-  - docker build -t feed-service .
-  - docker tag feed-service phoenix254/feed-service:v1
+env:
+  - DOCKER_COMPOSE_VERSION: 1.26.0
   
-  # Build docker image for user microservice and tag it with remote image
-  - cd ../user-service
-  - docker build -t user-service .
-  - docker tag user-service phoenix254/user-service:v1
+before_install:
+  # Print the version for logging
+  - docker --version && docker-compose --version
+  
+  ## Upgrade Docker Compose
+  # 1. Remove existing docker-compose
+  - sudo rm /usr/local/bin/docker-compose
 
-after_success:
-  # Deploy
+  # 2. Get the docker compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+
+  # 3. Update permissions for the folder and move it to system dir
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+  ## Configure Kubernetes - Ref: https://caveofcode.com/continuous-delivery-to-kubernetes-with-travis-ci/
+  # 1. Get Kubernetes
+  - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+  
+  # 2. Update permissions and move it to system dir
+  - chmod +x ./kubectl
+  - sudo mv ./kubectl /usr/local/bin/kubectl
+
+  # 3. Set kubernetes cluster config
+  - mkdir ${HOME}/.kube
+  # KUBE_CONFIG environment variable in Travis will hold base64 encoded string of your .kube/config file
+  - echo "$KUBE_CONFIG" | base64 --decode > ${HOME}/.kube/config
+
+  # 4. Verify
+  - kubectl get pods
+
+install:
+  # Build and push docker images
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push phoenix254/feed-service:v1
-  - docker push phoenix254/user-service:v1
+  - docker-compose build --parallel
+  - docker-compose push
+
+script:
+  # Deploy docker images to our kubernetes cluster
+  - echo "Kubernetes deployment is yet to be configured!"
