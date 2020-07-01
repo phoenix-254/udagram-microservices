@@ -1,5 +1,5 @@
 # Use NodeJS base image
-FROM node:14
+FROM node:13
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -11,12 +11,8 @@ COPY package*.json ./
 # Install dependencies
 RUN npm ci
 
-# Copy app source and config file(s)
-COPY ./src ./src
-COPY tsconfig*.json ./
-
-# Compile typescript to javascript
-RUN npm run tsc
+# Copy app files
+COPY . .
 
 # Bind the port that the image will run on
 EXPOSE 8080
