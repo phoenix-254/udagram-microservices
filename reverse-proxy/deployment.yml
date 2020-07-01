@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: reverse-proxy
-        image: phoenix254/udagram-reverse-proxy
+        image: phoenix254/udagram-reverse-proxy:v1
         imagePullPolicy: Always          
         ports:
         - containerPort: 8080
