@@ -16,11 +16,13 @@ services:
   # Udagram Feed Microservice
   feed-service:
     image: phoenix254/udagram-feed-service:v1
+    env_file: .env
     build:
       context: ./feed-service
 
   # Udagram User Microservice
   user-service:
     image: phoenix254/udagram-user-service:v1
+    env_file: .env
     build:
       context: ./user-service
