@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+  name: user-service
+  labels:
+    app: user-service
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+      - name: user-service
+        image: phoenix254/udagram-user-service:v1
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "500m"
+        env:
+        - name: UdagramPostgresqlUsername
+          valueFrom:
+            configMapKeyRef:
+              name: environment-config
+              key: UdagramPostgresqlUsername
+        - name: UdagramPostgresqlPassword
+          valueFrom:
+            configMapKeyRef:
+              name: environment-config
+              key: UdagramPostgresqlPassword
+        - name: UdagramPostgresqlDatabase
+          valueFrom:
+            configMapKeyRef:
+              name: environment-config
+              key: UdagramPostgresqlDatabase
+        - name: UdagramPostgresqlHost
+          valueFrom:
+            configMapKeyRef:
+              name: environment-config
+              key: UdagramPostgresqlHost
+        - name: UdagramAWSRegion
+          valueFrom:
+            configMapKeyRef:
+              name: environment-config
+              key: UdagramAWSRegion
+        - name: UdagramAWSProfile
+          valueFrom:
+            configMapKeyRef:
+              name: environment-config
+              key: UdagramAWSProfile
+        - name: UdagramAWSMediaBucket
+          valueFrom:
+            configMapKeyRef:
+              name: environment-config
+              key: UdagramAWSMediaBucket
+        - name: UdagramWebAppUrl
+          valueFrom:
+            configMapKeyRef:
+              name: environment-config
+              key: UdagramWebAppUrl
+        - name: UdagramJwtSecret
+          valueFrom:
+            configMapKeyRef:
+              name: environment-config
+              key: UdagramJwtSecret
