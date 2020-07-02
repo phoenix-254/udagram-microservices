@@ -1,0 +1,79 @@
+services:
+  - docker
+
+install:
+  ## Configure AWS
+
+  # 1. Get AWS CLI, install it and set path variable
+  - curl https://s3.amazonaws.com/aws-cli/awscli-bundle.zip -o awscli-bundle.zip
+  - unzip awscli-bundle.zip
+  - ./awscli-bundle/install -b ~/bin/aws
+  - export PATH=~/bin:$PATH
+  
+  # 2. Create config dir
+  - mkdir ${HOME}/.aws
+
+  # 3. Set AWS Configs
+  # AWS_CONFIG environment variable in Travis will hold base64 encoded string of your .aws/config file
+  - echo "$AWS_CONFIG" | base64 --decode > ${HOME}/.aws/config
+
+  # 4. AWS Credentials
+  # AWS_CREDS environment variable in Travis will hold base64 encoded string of your .aws/credentials file
+  - echo "$AWS_CREDS" | base64 --decode > ${HOME}/.aws/credentials
+
+
+  ## Configure Kubernetes - Ref: https://caveofcode.com/continuous-delivery-to-kubernetes-with-travis-ci/
+  
+  # 1. Get Kubernetes
+  - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+  
+  # 2. Update permissions and move it to system dir
+  - chmod +x ./kubectl
+  - sudo mv ./kubectl /usr/local/bin/kubectl
+
+  # 3. Set kubernetes cluster config
+  - mkdir ${HOME}/.kube
+  # KUBE_CONFIG environment variable in Travis will hold base64 encoded string of your .kube/config file
+  - echo "$KUBE_CONFIG" | base64 --decode > ${HOME}/.kube/config
+
+  # 4. Verify
+  - kubectl get pods
+
+
+script:
+  # Print the version for logging
+  - docker --version
+
+  # Build docker image for feed service and tag with remote image
+  - cd feed-service
+  - docker build -t udagram-feed-service:v1 .
+  - docker tag udagram-feed-service:v1 phoenix254/udagram-feed-service:v1
+
+  # Build docker image for user service and tag with remote image
+  - cd ../user-service
+  - docker build -t udagram-user-service:v1 .
+  - docker tag udagram-user-service:v1 phoenix254/udagram-user-service:v1
+
+  # Build docker image for frontend and tag with remote image
+  - cd ../frontend
+  - docker build -t udagram-web-app:v1 .
+  - docker tag udagram-web-app:v1 phoenix254/udagram-web-app:v1
+
+  # Build docker image for reverse proxy and tag with remote image
+  - cd ../reverse-proxy
+  - docker build -t udagram-reverse-proxy:v1 .
+  - docker tag udagram-reverse-proxy:v1 phoenix254/udagram-reverse-proxy:v1
+
+after_success:
+  # Push updated images to docker hub
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker push phoenix254/udagram-feed-service:v1
+  - docker push phoenix254/udagram-user-service:v1
+  - docker push phoenix254/udagram-web-app:v1
+  - docker push phoenix254/udagram-reverse-proxy:v1
+
+  # Deploy new images to kubernetes
+  - kubectl set image deployments/web-app web-app=phoenix254/udagram-web-app:v1
+  - kubectl set image deployments/feed-service feed-service=phoenix254/udagram-feed-service:v1
+  - kubectl set image deployments/user-service user-service=phoenix254/udagram-user-service:v1
+  - kubectl set image deployments/reverse-proxy reverse-proxy=phoenix254/udagram-reverse-proxy:v1

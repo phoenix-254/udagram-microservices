@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  # Proxies requests to internal services
+  reverse-proxy:
+    image: phoenix254/udagram-reverse-proxy:v1
+    build:
+      context: ./reverse-proxy
+  
+  # Udagram ionic web application
+  web-app:
+    image: phoenix254/udagram-web-app:v1
+    build: 
+      context: ./frontend
+
+  # Udagram Feed Microservice
+  feed-service:
+    image: phoenix254/udagram-feed-service:v1
+    env_file: .env
+    build:
+      context: ./feed-service
+
+  # Udagram User Microservice
+  user-service:
+    image: phoenix254/udagram-user-service:v1
+    env_file: .env
+    build:
+      context: ./user-service

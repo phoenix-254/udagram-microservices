@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+  name: web-app
+  labels:
+    service: web-app
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: web-app
+  template:
+    metadata:
+      labels:
+        service: web-app
+        api: external
+    spec:
+      containers:
+      - name: web-app
+        image: phoenix254/udagram-web-app:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "500m"
+      restartPolicy: Always
