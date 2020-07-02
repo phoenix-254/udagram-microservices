@@ -20,8 +20,7 @@ spec:
       containers:
       - name: user-service
         image: phoenix254/udagram-user-service:v1
-        ports:
-        - containerPort: 8080
+        imagePullPolicy: Always
         resources:
           requests:
             memory: "64Mi"
@@ -75,3 +74,4 @@ spec:
             configMapKeyRef:
               name: environment-config
               key: UdagramJwtSecret
+      restartPolicy: Alway
