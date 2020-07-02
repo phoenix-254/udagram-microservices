@@ -5,11 +5,11 @@ kind: Service
 metadata:
   name: feed-service
   labels: 
-    app: feed-service
+    service: feed-service
 
 spec:
   selector:
-    app: feed-service
+    service: feed-service
   ports:
   - name: "8080"
     port: 8080

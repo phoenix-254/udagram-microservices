@@ -5,11 +5,11 @@ kind: Service
 metadata:
   name: user-service
   labels: 
-    app: user-service
+    service: user-service
 
 spec:
   selector:
-    app: user-service
+    service: user-service
   ports:
   - name: "8080"
     port: 8080

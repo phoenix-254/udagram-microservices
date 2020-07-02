@@ -5,11 +5,11 @@ kind: Service
 metadata:
   name: reverse-proxy-service
   labels:
-    app: reverse-proxy
+    service: reverse-proxy
 
 spec:
   selector:
-    app: reverse-proxy
+    service: reverse-proxy
   ports:
   - name: "8080"
     port: 8080
