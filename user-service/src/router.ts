@@ -106,7 +106,7 @@ router.post('/auth/login', async(req: Request, res: Response) => {
     }
   
     // Generate JWT
-    const jwt = generateJWT(user.toJSON());
+    const jwt = generateJWT(user);
   
     res.status(200).send({ 
         auth: true, 
@@ -116,7 +116,7 @@ router.post('/auth/login', async(req: Request, res: Response) => {
 });
 
 // POST : api/v0/users/auth/
-router.post('/auth/', async(req: Request, res: Response) => {
+router.post('/auth', async(req: Request, res: Response) => {
     const email = req.body.email;
     const password = req.body.password;
 
@@ -154,7 +154,7 @@ router.post('/auth/', async(req: Request, res: Response) => {
     const savedUser = await newUser.save();
   
     // Generate JWT
-    const jwt = generateJWT(savedUser.toJSON());
+    const jwt = generateJWT(savedUser);
   
     res.status(201).send({
         token: jwt, 

@@ -9,6 +9,9 @@ metadata:
 
 spec:
   replicas: 2
+  selector:
+    matchLabels: 
+      service: user-service
   template:
     metadata:
       labels:
@@ -71,4 +74,4 @@ spec:
             configMapKeyRef:
               name: environment-config
               key: UdagramJwtSecret
-      restartPolicy: Alway
+      restartPolicy: Always
